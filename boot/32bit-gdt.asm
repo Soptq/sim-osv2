@@ -1,3 +1,5 @@
+; in x86, there is only one GDT, which pointed to 0x0 and has a length of 0xFFFFFFFF.
+
 gdt_start:
     ; The CPU requires that the first entry in the GDT
     ; purposely be an invalid null descriptor, this
@@ -5,6 +7,8 @@ gdt_start:
     ; register is set to 0x0
     dd 0x0;     ; let us call it code segment
     dd 0x0;     ; let us call it data segment
+
+; real GDT starts at 0x08
 
 gdt_code:
     dw 0xffff   ; 00-15     segment limit

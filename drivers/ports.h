@@ -4,8 +4,11 @@
 
 #ifndef SIM_OS_PORTS_H
 #define SIM_OS_PORTS_H
-unsigned char port_byte_in (unsigned short port);
-void port_byte_out (unsigned short port, unsigned char data);
-unsigned short port_word_in (unsigned short port);
-void port_word_out (unsigned short port, unsigned short data);
+
+#include "../cpu/types.h"
+
+u8 port_byte_in (u16 port);
+void port_byte_out (u16, u8 data);
+u16 port_word_in (u16 port);
+void port_word_out (u16 port, u16 data);
 #endif //SIM_OS_PORTS_H

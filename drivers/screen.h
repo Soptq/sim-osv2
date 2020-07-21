@@ -14,8 +14,13 @@
 #define REG_SCREEN_CTRL 0x3d4
 #define REG_SCREEN_DATA 0x3d5
 
+#include "../cpu/types.h"
+
 void clear_screen();
-void kprint_at(char *message, int col, int row);
-void kprint(char *message);
+void kprint_at(s8 *message, s32 col, s32 row);
+void kprint(s8 *message);
+void kprintln(s8 *message);
+void err_kprint(s8 *message);
+void err_kprintln(s8 *message);
 
 #endif //SIM_OS_SCREEN_H
