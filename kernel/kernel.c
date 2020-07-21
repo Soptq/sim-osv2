@@ -2,24 +2,18 @@
 // Created by Soptq on 2020/7/21.
 //
 
-#include "../drivers/ports.h"
+#include "../drivers/screen.h"
+#include "util.h"
 
 void main() {
-    /* Firstly we ask VGA control register (0x3d4) for cursor position */
-    /* 14 for high byte and 15 for low byte of cursor position */
-    port_byte_out(0x3d4, 14);
-    /* After asking, the answer is stored in VGGA data register (0x3d5) */
-    int position = port_byte_in(0x3d5);
-    position <<= 8;
+    clear_screen();
 
-    port_byte_out(0x3d4, 15);
-    position += port_byte_in(0x3d5);
-
-    /* each character takes 2 bytes */
-    int offset_from_vga = position * 2;
-
-    char* vga = 0xb8000;
-    vga[offset_from_vga++] = 'X';
-    vga[offset_from_vga++] = 0x0f;
+    for (int i = 0; i < MAX_ROWS - 1; ++i) {
+        char str[255];
+        int_to_ascii(i, str);
+        kprint_at(str, 0, i);
+    }
+    kprint_at("This text forces the kernel to scroll. Row 0 will disappear. ", 60, 24);
+    kprint("And with this text, the kernel will scroll again, and row 1 will disappear too!");
 }
 
