@@ -15,6 +15,8 @@
 #define REG_SCREEN_DATA 0x3d5
 
 #include "../cpu/types.h"
+#include "ports.h"
+#include "../kernel/util.h"
 
 void clear_screen();
 void kprint_at(s8 *message, s32 col, s32 row);
@@ -22,5 +24,6 @@ void kprint(s8 *message);
 void kprintln(s8 *message);
 void err_kprint(s8 *message);
 void err_kprintln(s8 *message);
+void kbackspace();
 
 #endif //SIM_OS_SCREEN_H

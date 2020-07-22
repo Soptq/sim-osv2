@@ -1,4 +1,5 @@
 [extern isr_handler]
+[extern irq_handler]
 
 isr_common_stub:
     ; 1. Save CPU state
@@ -25,9 +26,34 @@ isr_common_stub:
     sti
     iret ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
 
+; different from isr, before returning we have to inform PIC that we have finished the interrupt (EOI)
+irq_common_stub:
+    ; 1. Save CPU state
+    pusha   ; Pushes edi, esi, ebp, esp, ebx, edx, ecx, eax
+    mov ax, ds;
+    push eax    ; save data segment
+    mov ax, 0x10    ; DATA SEGMENT
+    mov ds, ax      ; init data segment
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+
+    call irq_handler
+
+    pop ebx
+    mov ds, bx
+    mov es, bx
+    mov fs, bx
+    mov gs, bx
+    popa
+    add esp, 8
+    sti
+    iret
+
+
 ; When the interrupts is triggered, below handler will be executed
 %macro ISR_NOERRCODE 1  ; define a macro, taking one parameter
-[global isr%1]        ; %1 accesses the first parameter.
+global isr%1        ; %1 accesses the first parameter.
 isr%1:
     cli
     push byte 0         ; under this interrupts the CPU will not automatically pushes a error code
@@ -37,11 +63,20 @@ isr%1:
 %endmacro
 
 %macro ISR_ERRCODE 1
-[global isr%1]
+global isr%1
 isr%1:
     cli
     push byte %1
     jmp isr_common_stub
+%endmacro
+
+%macro IRQ 2
+global irq%1
+irq%1:
+    cli
+    push byte 0
+    push byte %2
+    jmp irq_common_stub
 %endmacro
 
 ; 0: Divide By Zero Exception
@@ -108,3 +143,21 @@ ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ; 31: Reserved
 ISR_NOERRCODE 31
+
+; IRQ
+IRQ     0,      32
+IRQ     1,      33
+IRQ     2,      34
+IRQ     3,      35
+IRQ     4,      36
+IRQ     5,      37
+IRQ     6,      38
+IRQ     7,      39
+IRQ     8,      40
+IRQ     9,      41
+IRQ     10,     42
+IRQ     11,     43
+IRQ     12,     44
+IRQ     13,     45
+IRQ     14,     46
+IRQ     15,     47

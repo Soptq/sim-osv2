@@ -3,8 +3,6 @@
 //
 
 #include "screen.h"
-#include "ports.h"
-#include "../kernel/util.h"
 
 void _kprint_at(s8 *message, s32 col, s32 row, s8 attr);
 s32 print_char(s8 c, s32 col, s32 row, s8 attr);
@@ -55,6 +53,16 @@ void clear_screen() {
         vidptr[i * 2 + 1] = WHITE_ON_BLACK;
     }
     set_cursor_offset(get_offset(0, 0));
+}
+
+void kbackspace() {
+    s32 offset = get_cursor_offset() - 2;
+    if (offset == 0) return;
+
+    s32 col = get_offset_col(offset);
+    s32 row = get_offset_row(offset);
+    print_char(' ', col, row, WHITE_ON_BLACK);
+    set_cursor_offset(offset);
 }
 
 /**
