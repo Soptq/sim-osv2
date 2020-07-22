@@ -5,7 +5,7 @@
 #include "../cpu/isr.h"
 #include "../drivers/screen.h"
 
-void main() {
+void kernel_main() {
     isr_install();
     irq_install();
 

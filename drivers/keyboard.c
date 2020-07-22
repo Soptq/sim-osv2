@@ -12,16 +12,16 @@
 /**
  * Starting from 0x02 and ends at 0x35
  */
-const s8* KEYBOARD_CODES = "1234567890-=  qwertyuiop[]  asdfghjkl;'` \\zxcvbnm,./";
-const s8* SHIFT_KEYBOARD_CODES = "!@#$%^&*()_+  QWERTYUIOP{}  ASDFGHJKL:\"~ |ZXCVBNM<>?";
+const int8_t* KEYBOARD_CODES = "1234567890-=  qwertyuiop[]  asdfghjkl;'` \\zxcvbnm,./";
+const int8_t* SHIFT_KEYBOARD_CODES = "!@#$%^&*()_+  QWERTYUIOP{}  ASDFGHJKL:\"~ |ZXCVBNM<>?";
 
-s8 shift_pressed = 0;
-s8 capslock_pressed = 0;
+int8_t shift_pressed = 0;
+int8_t capslock_pressed = 0;
 
-static s8 key_buffer[256];
+static int8_t key_buffer[256];
 
-static void keyboard_callback(registers_t t) {
-    u8 scancode = port_byte_in(0x60);
+static void keyboard_callback(registers_t *t) {
+    uint8_t scancode = port_byte_in(0x60);
 
     /* 'keuyp' event corresponds to the 'keydown' + 0x80
      * it may still be a scancode we haven't implemented yet, or
@@ -125,13 +125,13 @@ static void keyboard_callback(registers_t t) {
                 break;
             default:
                 if (0x02 <= scancode && scancode <= 0x35 ) {
-                    s8 input;
+                    int8_t input;
                     if (capslock_pressed || shift_pressed) {
                         input = SHIFT_KEYBOARD_CODES[scancode - 0x02];
                     } else {
                         input = KEYBOARD_CODES[scancode - 0x02];
                     }
-                    s8 str[2] = {input, '\0'};
+                    int8_t str[2] = {input, '\0'};
                     append(key_buffer, input);
                     kprint(str);
                 }

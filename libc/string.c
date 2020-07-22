@@ -11,12 +11,12 @@
  * @param n : the integer;
  * @param str : the string container;
  */
-void int_to_ascii(s32 n, s8* str) {
-    s32 sign, index = 0;
+void int_to_ascii(int32_t  n, int8_t* str) {
+    int32_t  sign, index = 0;
     if ((sign = n) < 0)
         n = -n;
     do {
-        *(str + index++) = (s8)(n % 10 + (s32)'0');
+        *(str + index++) = (int8_t)(n % 10 + (int32_t )'0');
     } while ((n /= 10) > 0);
 
     if (sign < 0) {
@@ -27,38 +27,53 @@ void int_to_ascii(s32 n, s8* str) {
     strrev(str);
 }
 
-void strrev(s8 *str) {
+void hex_to_ascii(int32_t  n, int8_t* str) {
+    append(str, '0');
+    append(str, 'x');
+    int8_t zeros = 0;
+
+    int32_t  tmp;
+    for (int32_t  i = 28; i > 0; i -= 4) {
+        tmp = (n >> i) & 0xF;
+        if (tmp == 0 && zeros == 0) continue;
+        zeros = 1;
+        if (tmp > 0xA) append(str, tmp - 0xA + 'a');
+        else append(str, tmp + '0');
+    }
+}
+
+void strrev(int8_t *str) {
     if (!str) return;       /* if str is null pointer, return*/
-    s8 *rev = str;
+    int8_t *rev = str;
     while (*rev) ++rev;
     --rev;                  /* find the last char in str */
 
     for ( ; str < rev; ++str, --rev) {
-        s8 h = *str, t = *rev;
+        int8_t h = *str, t = *rev;
         *str = t;
         *rev = h;
     }
 }
 
-s32 strlen(const s8* s) {
-    s32 i = 0;
+int32_t  strlen(const int8_t* s) {
+    int32_t  i = 0;
     while (*(s + i++) != '\0');
     return --i;
 }
 
-void append(s8* s, s8 n) {
-    s32 len = strlen(s);
+void append(int8_t* s, int8_t n) {
+    int32_t  len = strlen(s);
     *(s + len++) = n;
     *(s + len) = '\0';
 }
 
-void backspace(s8* s) {
-    s32 len = strlen(s);
+void backspace(int8_t* s) {
+    int32_t  len = strlen(s);
     s[len - 1] = '\0';
 }
 
-s32 strcmp(s8* s1, s8* s2) {
-    s32 i;
+int32_t  strcmp(int8_t* s1, int8_t* s2) {
+    int32_t  i;
     for (i = 0; *(s1 + i) == *(s2 + i); ++i) {
         if (s1[i] == '\0') return 0;
     }

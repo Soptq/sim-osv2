@@ -4,14 +4,13 @@
 
 #include "screen.h"
 
-void _kprint_at(s8 *message, s32 col, s32 row, s8 attr);
-s32 print_char(s8 c, s32 col, s32 row, s8 attr);
-s32 get_cursor_offset();
-void set_cursor_offset(s32 offset);
-void clear_screen();
-s32 get_offset(s32 col, s32 row);
-s32 get_offset_row(s32 offset);
-s32 get_offset_col(s32 offset);
+void _kprint_at(char *message, int32_t  col, int32_t  row, int8_t attr);
+int32_t  print_char(char c, int32_t  col, int32_t  row, int8_t attr);
+int32_t  get_cursor_offset();
+void set_cursor_offset(int32_t  offset);
+int32_t  get_offset(int32_t  col, int32_t  row);
+int32_t  get_offset_row(int32_t  offset);
+int32_t  get_offset_col(int32_t  offset);
 
 
 /**
@@ -23,32 +22,32 @@ s32 get_offset_col(s32 offset);
  */
 
 
-void kprint_at(s8 *message, s32 col, s32 row) {
+void kprint_at(char *message, int32_t  col, int32_t  row) {
     _kprint_at(message, col, row, WHITE_ON_BLACK);
 }
 
-void kprint(s8 *message) {
+void kprint(char *message) {
     kprint_at(message, -1, -1);
 }
 
-void kprintln(s8 *message) {
+void kprintln(char *message) {
     kprint(message);
     kprint("\n");
 }
 
-void err_kprint(s8 *message) {
+void err_kprint(char *message) {
     _kprint_at(message, -1, -1, RED_ON_WHITE);
 }
 
-void err_kprintln(s8 *message) {
+void err_kprintln(char *message) {
     err_kprint(message);
     kprint("\n");
 }
 
 void clear_screen() {
-    s32 screen_size = MAX_COLS * MAX_ROWS;
-    s8* vidptr = (s8*)VIDEO_ADDRESS;
-    for (s32 i = 0; i < screen_size; ++i) {
+    int32_t  screen_size = MAX_COLS * MAX_ROWS;
+    int8_t* vidptr = (int8_t*)VIDEO_ADDRESS;
+    for (int32_t  i = 0; i < screen_size; ++i) {
         vidptr[i * 2] = ' ';
         vidptr[i * 2 + 1] = WHITE_ON_BLACK;
     }
@@ -57,9 +56,9 @@ void clear_screen() {
 
 
 void kbackspace() {
-    s32 offset = get_cursor_offset() - 2;
-    s32 col = get_offset_col(offset);
-    s32 row = get_offset_row(offset);
+    int32_t  offset = get_cursor_offset() - 2;
+    int32_t  col = get_offset_col(offset);
+    int32_t  row = get_offset_row(offset);
     print_char(' ', col, row, WHITE_ON_BLACK);
     set_cursor_offset(offset);
 }
@@ -83,16 +82,16 @@ void kbackspace() {
  */
 
 
-void _kprint_at(s8 *message, s32 col, s32 row, s8 attr) {
+void _kprint_at(char *message, int32_t  col, int32_t  row, int8_t attr) {
     if (!attr) attr = WHITE_ON_BLACK;
-    s32 offset;
+    int32_t  offset;
     if (col < 0 || row < 0) {
         offset = get_cursor_offset();
         row = get_offset_row(offset);
         col = get_offset_col(offset);
     }
 
-    s32 i = 0;
+    int32_t  i = 0;
     while (message[i] != 0) {
         offset = print_char(message[i++], col, row, attr);
         row = get_offset_row(offset);
@@ -101,8 +100,8 @@ void _kprint_at(s8 *message, s32 col, s32 row, s8 attr) {
 }
 
 
-s32 print_char(s8 c, s32 col, s32 row, s8 attr) {
-    u8* vidmem = (u8*) VIDEO_ADDRESS;
+int32_t print_char(char c, int32_t  col, int32_t  row, int8_t attr) {
+    uint8_t* vidmem = (uint8_t*) VIDEO_ADDRESS;
     if (!attr) attr = WHITE_ON_BLACK;
 
     /* Error control: print a red 'E' if the coords aren't right */
@@ -112,7 +111,7 @@ s32 print_char(s8 c, s32 col, s32 row, s8 attr) {
         return get_offset(col, row);
     }
 
-    s32 offset;
+    int32_t  offset;
     if (col >= 0 && row >= 0)
         offset = get_offset(col, row);
     else
@@ -128,16 +127,16 @@ s32 print_char(s8 c, s32 col, s32 row, s8 attr) {
 
     /* check if the offset is over screen size and scroll */
     if (offset >= MAX_ROWS * MAX_COLS * 2) {
-        for (s32 i = 1; i < MAX_ROWS; ++i) {
+        for (int32_t  i = 1; i < MAX_ROWS; ++i) {
             /* scroll one row */
-            memory_copy((u8 *) (get_offset(0, i) + VIDEO_ADDRESS),
-                        (u8 *) (get_offset(0, i - 1) + VIDEO_ADDRESS),
+            memory_copy((uint8_t *) (get_offset(0, i) + VIDEO_ADDRESS),
+                        (uint8_t *) (get_offset(0, i - 1) + VIDEO_ADDRESS),
                     MAX_COLS * 2);
         }
 
         /* blank the last line */
-        s8* last_line = (s8 *) (get_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS);
-        for (s32 i = 0; i < MAX_COLS * 2; ++i) last_line[i] = 0;
+        int8_t* last_line = (int8_t *) (get_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS);
+        for (int32_t  i = 0; i < MAX_COLS * 2; ++i) last_line[i] = 0;
 
         offset -= 2 * MAX_COLS;
     }
@@ -146,31 +145,31 @@ s32 print_char(s8 c, s32 col, s32 row, s8 attr) {
     return offset;
 }
 
-s32 get_cursor_offset() {
+int32_t  get_cursor_offset() {
     port_byte_out(REG_SCREEN_CTRL, 14);
-    s32 offset = port_byte_in(REG_SCREEN_DATA) << 8;
+    int32_t  offset = port_byte_in(REG_SCREEN_DATA) << 8;
     port_byte_out(REG_SCREEN_CTRL, 15);
     offset += port_byte_in(REG_SCREEN_DATA);
     return offset * 2;
 }
 
-void set_cursor_offset(s32 offset) {
+void set_cursor_offset(int32_t  offset) {
     offset /= 2;
     port_byte_out(REG_SCREEN_CTRL, 14);
     /* Firstly we send the higher 8 bits of the offset */
-    port_byte_out(REG_SCREEN_DATA, (u8)(offset >> 8));
+    port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset >> 8));
     port_byte_out(REG_SCREEN_CTRL, 15);
-    port_byte_out(REG_SCREEN_DATA, (u8)(offset & 0xff));
+    port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset & 0xff));
 }
 
-s32 get_offset(s32 col, s32 row) {
+int32_t  get_offset(int32_t  col, int32_t  row) {
     return 2 * (row * MAX_COLS + col);
 }
 
-s32 get_offset_row(s32 offset) {
+int32_t  get_offset_row(int32_t  offset) {
     return offset / (2 * MAX_COLS);
 }
 
-s32 get_offset_col(s32 offset) {
+int32_t  get_offset_col(int32_t  offset) {
     return (offset - (2 * MAX_COLS * get_offset_row(offset))) / 2;
 }

@@ -5,13 +5,16 @@
 #ifndef SIM_OS_STRING_H
 #define SIM_OS_STRING_H
 
-#include "../cpu/types.h"
+#include "../cpu/type.h"
 
-void int_to_ascii(s32 n, s8* str);
-void strrev(s8 *str);
-s32 strlen(const s8* s);
-void append(s8* s, s8 n);
-void backspace(s8* s);
-s32 strcmp(s8* s1, s8* s2);
+void int_to_ascii(int32_t  n, int8_t* str);
+void hex_to_ascii(int32_t  n, int8_t* str);
+
+
+void strrev(int8_t *str);
+int32_t  strlen(const int8_t* s);
+void append(int8_t* s, int8_t n);
+void backspace(int8_t* s);
+int32_t  strcmp(int8_t* s1, int8_t* s2);
 
 #endif //SIM_BOOTLOADER_STRING_H

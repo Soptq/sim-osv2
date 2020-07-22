@@ -11,11 +11,14 @@ isr_common_stub:
     mov es, ax
     mov fs, ax
     mov gs, ax
+    push esp
 
     ; 2. Call C handler
+    cld
     call isr_handler
 
     ; 3. Restore state
+    pop eax
     pop eax
     mov ds, ax
     mov es, ax
@@ -23,7 +26,6 @@ isr_common_stub:
     mov gs, ax
     popa
     add esp, 8 ; Cleans up the pushed error code and pushed ISR number
-    sti
     iret ; pops 5 things at once: CS, EIP, EFLAGS, SS, and ESP
 
 ; different from isr, before returning we have to inform PIC that we have finished the interrupt (EOI)
@@ -37,9 +39,12 @@ irq_common_stub:
     mov es, ax
     mov fs, ax
     mov gs, ax
+    push esp
 
+    cld
     call irq_handler
 
+    pop ebx
     pop ebx
     mov ds, bx
     mov es, bx
@@ -47,7 +52,6 @@ irq_common_stub:
     mov gs, bx
     popa
     add esp, 8
-    sti
     iret
 
 
@@ -55,7 +59,6 @@ irq_common_stub:
 %macro ISR_NOERRCODE 1  ; define a macro, taking one parameter
 global isr%1        ; %1 accesses the first parameter.
 isr%1:
-    cli
     push byte 0         ; under this interrupts the CPU will not automatically pushes a error code
                         ; so we manually push one to maintain stack's stability
     push byte %1
@@ -65,7 +68,6 @@ isr%1:
 %macro ISR_ERRCODE 1
 global isr%1
 isr%1:
-    cli
     push byte %1
     jmp isr_common_stub
 %endmacro
@@ -73,7 +75,6 @@ isr%1:
 %macro IRQ 2
 global irq%1
 irq%1:
-    cli
     push byte 0
     push byte %2
     jmp irq_common_stub

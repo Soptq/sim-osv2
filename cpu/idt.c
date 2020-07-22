@@ -4,7 +4,7 @@
 
 #include "idt.h"
 
-void set_idt_gate(s32 n, u32 handler, u16 sel, u8 flags) {
+void set_idt_gate(int32_t  n, uint32_t handler, uint16_t sel, uint8_t flags) {
     idt[n].low_offset = low_16(handler);
     idt[n].sel = sel;
     idt[n].always0 = 0;
@@ -13,8 +13,8 @@ void set_idt_gate(s32 n, u32 handler, u16 sel, u8 flags) {
 }
 
 void set_idt() {
-    idt_reg.base = (u32) &idt;
+    idt_reg.base = (uint32_t) &idt;
     idt_reg.limit = IDT_ENTRIES * sizeof(idt_gate_t) - 1;
-    /* __volatile__: no optimization for GCC */
-    __asm__ __volatile__("lidtl (%0)" : : "r" (&idt_reg));
+    /* volatile: no optimization for GCC */
+    asm volatile("lidtl (%0)" : : "r" (&idt_reg));
 }
