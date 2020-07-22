@@ -5,7 +5,7 @@
 #ifndef SIM_OS_PORTS_H
 #define SIM_OS_PORTS_H
 
-#include "../cpu/types.h"
+#include "types.h"
 
 u8 port_byte_in (u16 port);
 void port_byte_out (u16, u8 data);

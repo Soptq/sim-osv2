@@ -5,7 +5,9 @@
 #ifndef SIM_OS_KEYBOARD_H
 #define SIM_OS_KEYBOARD_H
 
-#include "../cpu/types.h"
+/**
+ * Details of keycode mapping: https://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
+ */
 
 #define KEYDOWN_ERROR 0x00
 #define KEYDOWN_ESC 0x01
@@ -55,12 +57,6 @@
 #define KEYUP_CAPSLOCK 0xba
 
 #define KEYDOWN_ESCAPE 0xe0
-
-/**
- * Starting from 0x02 and ends at 0x35
- */
-const u8* KEYBOARD_TWOFACECHAR = "1234567890-=  qwertyuiop[]  asdfghjkl;'` \\zxcvbnm,./";
-const u8* SHIFT_KEYBOARD_TWOFACECHAR = "!@#$%^&*()_+  QWERTYUIOP{}  ASDFGHJKL:\"~ |ZXCVBNM<>?";
 
 
 void init_keyboard();

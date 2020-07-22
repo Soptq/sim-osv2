@@ -55,15 +55,15 @@ void clear_screen() {
     set_cursor_offset(get_offset(0, 0));
 }
 
+
 void kbackspace() {
     s32 offset = get_cursor_offset() - 2;
-    if (offset == 0) return;
-
     s32 col = get_offset_col(offset);
     s32 row = get_offset_row(offset);
     print_char(' ', col, row, WHITE_ON_BLACK);
     set_cursor_offset(offset);
 }
+
 
 /**
  * ================================================================================
@@ -130,13 +130,13 @@ s32 print_char(s8 c, s32 col, s32 row, s8 attr) {
     if (offset >= MAX_ROWS * MAX_COLS * 2) {
         for (s32 i = 1; i < MAX_ROWS; ++i) {
             /* scroll one row */
-            memory_copy((s8 *) (get_offset(0, i) + VIDEO_ADDRESS),
-                        (s8 *) (get_offset(0, i - 1) + VIDEO_ADDRESS),
+            memory_copy((u8 *) (get_offset(0, i) + VIDEO_ADDRESS),
+                        (u8 *) (get_offset(0, i - 1) + VIDEO_ADDRESS),
                     MAX_COLS * 2);
         }
 
         /* blank the last line */
-        s8* last_line = get_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS;
+        s8* last_line = (s8 *) (get_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS);
         for (s32 i = 0; i < MAX_COLS * 2; ++i) last_line[i] = 0;
 
         offset -= 2 * MAX_COLS;
@@ -144,7 +144,6 @@ s32 print_char(s8 c, s32 col, s32 row, s8 attr) {
 
     set_cursor_offset(offset);
     return offset;
-
 }
 
 s32 get_cursor_offset() {

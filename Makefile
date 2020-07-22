@@ -1,78 +1,51 @@
 # $@ = target file
 # $< = first dependency
 # $^ = all dependencies
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c)
+HEADERS = $(wildcard kernel/*.h drivers/*.h cpu/*.h libc/*.h)
+# Nice syntax for file extension replacement
+OBJ = ${C_SOURCES:.c=.o cpu/interrupt.o}
 
-
-KERNEL_C_SOURCES = $(wildcard kernel/*.c)
-KERNEL_HEADERS = $(wildcard kernel/*.h)
-DRIVERS_C_SOURCES = $(wildcard drivers/*.c)
-DRIVERS_HEADERS = $(wildcard drivers/*.h)
-CPU_C_SOURCES = $(wildcard cpu/*.c)
-CPU_HEADERS = $(wildcard cpu/*.h)
-
-KERNEL_OBJ = $(KERNEL_C_SOURCES:kernel/%.c=build/%.o)
-DRIVERS_OBJ = $(DRIVERS_C_SOURCES:drivers/%.c=build/%.o)
-CPU_OBJ = $(CPU_C_SOURCES:cpu/%.c=build/%.o build/interrupt.o)
-
+# Change this if your cross-compiler is somewhere else
 CC = /usr/local/i386elfgcc/bin/i386-elf-gcc
 GDB = /usr/local/i386elfgcc/bin/i386-elf-gdb
+# -g: Use debugging symbols in gcc
+CFLAGS = -g -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs \
+		 -Wall -Wextra -Werror
 
-CFLAGS = -g
 
-all: run
+# First rule is run by default
+os-image.bin: boot/boot-sector.bin kernel.bin
+	cat $^ > os-image.bin
 
-build/kernel.bin: build/kernel_entry.o ${KERNEL_OBJ} ${DRIVERS_OBJ} ${CPU_OBJ}
+# '--oformat binary' deletes all symbols as a collateral, so we don't need
+# to 'strip' them manually on this case
+kernel.bin: boot/kernel_entry.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x1000 $^ --oformat binary
 
-build/kernel.elf: build/kernel_entry.o ${KERNEL_OBJ} ${DRIVERS_OBJ} ${CPU_OBJ}
+# Used for debugging purposes
+kernel.elf: boot/kernel_entry.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x1000 $^
 
-kernel.dis: build/kernel.bin
-	ndisasm -b 32 $< > <@
-
-os-image.bin: build/boot-sector.bin build/kernel.bin
-	cat $^ > $@
-
 run: os-image.bin
-	qemu-system-i386 -fda $<
+	qemu-system-i386 -fda os-image.bin
 
-debug: os-image.bin build/kernel.elf
-	qemu-system-i386 -s -S -fda $< &
-	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file build/kernel.elf"
+# Open the connection to qemu and load our kernel-object file with symbols
+debug: os-image.bin kernel.elf
+	qemu-system-i386 -s -S -fda os-image.bin -d guest_errors &
+	${GDB} -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
 
-# ----------------------------------------------------------------------------------------------------------------------
-#
-#	DEFAULT
-#
-# ----------------------------------------------------------------------------------------------------------------------
-
-build/%.o: kernel/%.c
+# Generic rules for wildcards
+# To make an object, always compile from its .c
+%.o: %.c ${HEADERS}
 	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
 
-
-
-build/%.o: drivers/%.c
-	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
-
-
-
-build/%.o: cpu/%.c
-	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
-
-build/%.o: cpu/%.asm
+%.o: %.asm
 	nasm $< -f elf -o $@
 
-build/%.o: cpu/%.asm
-	nasm $< -f elf -o $@
-
-
-build/%.o: boot/%.asm
-	nasm $< -f elf -o $@
-
-build/%.bin: boot/%.asm
+%.bin: %.asm
 	nasm $< -f bin -o $@
 
-
-
 clean:
-	rm build/*
+	rm -rf *.bin *.dis *.o os-image.bin *.elf
+	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o cpu/*.o libc/*.o

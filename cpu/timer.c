@@ -5,15 +5,13 @@
 #include "timer.h"
 #include "../drivers/screen.h"
 #include "isr.h"
+#include "../libc/function.h"
 
 u32 tick = 0;
 
 static void timer_callback(registers_t regs) {
     tick++;
-    kprint("Ticks: ");
-    char tick_ascii[256];
-    int_to_ascii(tick, tick_ascii);
-    kprintln(tick_ascii);
+    UNUSED(regs);
 }
 
 

@@ -15,8 +15,9 @@
 #define REG_SCREEN_DATA 0x3d5
 
 #include "../cpu/types.h"
-#include "ports.h"
-#include "../kernel/util.h"
+#include "../cpu/ports.h"
+#include "../libc/string.h"
+#include "../libc/mem.h"
 
 void clear_screen();
 void kprint_at(s8 *message, s32 col, s32 row);

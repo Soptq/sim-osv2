@@ -1,17 +1,8 @@
 //
-// Created by Soptq on 2020/7/21.
+// Created by Soptq on 2020/7/22.
 //
 
-#include "util.h"
-
-void strrev(char *str);
-s32 strlen(const s8* s);
-
-void memory_copy(u8 *source, u8 *dest, u32 len) {
-    for (s32 i = 0; i < len; i++) {
-        *(dest + i) = *(source + i);
-    }
-}
+#include "string.h"
 
 /**
  * convert integer to string reversely
@@ -52,5 +43,24 @@ void strrev(s8 *str) {
 s32 strlen(const s8* s) {
     s32 i = 0;
     while (*(s + i++) != '\0');
-    return i;
+    return --i;
+}
+
+void append(s8* s, s8 n) {
+    s32 len = strlen(s);
+    *(s + len++) = n;
+    *(s + len) = '\0';
+}
+
+void backspace(s8* s) {
+    s32 len = strlen(s);
+    s[len - 1] = '\0';
+}
+
+s32 strcmp(s8* s1, s8* s2) {
+    s32 i;
+    for (i = 0; *(s1 + i) == *(s2 + i); ++i) {
+        if (s1[i] == '\0') return 0;
+    }
+    return *(s1 + i) - *(s2 + i);
 }

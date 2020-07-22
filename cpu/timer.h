@@ -5,7 +5,7 @@
 #ifndef SIM_OS_TIMER_H
 #define SIM_OS_TIMER_H
 
-#include "../kernel/util.h"
+#include "../libc/string.h"
 
 void init_timer(u32 freq);
 
