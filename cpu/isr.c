@@ -132,17 +132,23 @@ char *exception_messages[] = {
 
 
 void isr_handler(registers_t *r) {
-    int8_t int_no[3];  /* 0-255 */
-    int8_t error_code[11];
+    char int_no[3];  /* 0-255 */
+    char error_code[11];
     int_to_ascii(r -> int_no, int_no);
     int_to_ascii(r -> err_code, error_code);
-    kprint("Received Interrupt! ISR NUM ");
-    err_kprint((char *)int_no);
+    err_kprint("Received Interrupt!");
+    kprint(" ISR NUM ");
+    err_kprint(int_no);
     kprint(" Error Code ");
-    err_kprintln((char *)error_code);
+    err_kprintln(error_code);
     kprint("Detail: ");
     err_kprintln(exception_messages[r -> int_no]);
     kprintln("");
+
+    if (interrupt_handlers[r -> int_no] != 0) {
+        isr_t handler = interrupt_handlers[r -> int_no];
+        handler(r);
+    }
 }
 
 void register_interrupt_handler(uint8_t n, isr_t handler) {

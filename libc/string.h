@@ -7,14 +7,14 @@
 
 #include "../cpu/type.h"
 
-void int_to_ascii(int32_t  n, int8_t* str);
-void hex_to_ascii(int32_t  n, int8_t* str);
+void int_to_ascii(int32_t  n, char* str);
+void hex_to_ascii(int32_t  n, char* str);
+void int_to_hexstr(uint32_t n, char* str);
 
-
-void strrev(int8_t *str);
-int32_t  strlen(const int8_t* s);
-void append(int8_t* s, int8_t n);
-void backspace(int8_t* s);
-int32_t  strcmp(int8_t* s1, int8_t* s2);
+void strrev(char* str);
+int32_t  strlen(const char* s);
+void append(char* s, char n);
+void backspace(char* s);
+int32_t  strcmp(char* s1, char* s2);
 
 #endif //SIM_BOOTLOADER_STRING_H

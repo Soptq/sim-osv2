@@ -4,6 +4,11 @@
 
 #include "string.h"
 
+
+void str_clear(char* str) {
+    str[0] = '\0';
+}
+
 /**
  * convert integer to string reversely
  * 123 => "321"; -123 => "321-"
@@ -11,7 +16,8 @@
  * @param n : the integer;
  * @param str : the string container;
  */
-void int_to_ascii(int32_t  n, int8_t* str) {
+void int_to_ascii(int32_t  n, char* str) {
+    str_clear(str);
     int32_t  sign, index = 0;
     if ((sign = n) < 0)
         n = -n;
@@ -27,7 +33,8 @@ void int_to_ascii(int32_t  n, int8_t* str) {
     strrev(str);
 }
 
-void hex_to_ascii(int32_t  n, int8_t* str) {
+void hex_to_ascii(int32_t  n, char* str) {
+    str_clear(str);
     append(str, '0');
     append(str, 'x');
     int8_t zeros = 0;
@@ -42,37 +49,61 @@ void hex_to_ascii(int32_t  n, int8_t* str) {
     }
 }
 
-void strrev(int8_t *str) {
+
+char c_int_to_hex(int index) {
+    if (0 <= index && index < 10) {
+        return (char)(index + '0');
+    } else if (index < 16) {
+        return (char)(index - 10 + 'a');
+    } else {
+        return '?';
+    }
+}
+
+
+void int_to_hexstr(uint32_t n, char* str) {
+    str_clear(str);
+    while (n != 0) {
+        append(str, c_int_to_hex(n % 16));
+        n /= 16;
+    }
+    append(str, 'x');
+    append(str, '0');
+    strrev(str);
+}
+
+
+void strrev(char *str) {
     if (!str) return;       /* if str is null pointer, return*/
-    int8_t *rev = str;
+    char *rev = str;
     while (*rev) ++rev;
     --rev;                  /* find the last char in str */
 
     for ( ; str < rev; ++str, --rev) {
-        int8_t h = *str, t = *rev;
+        char h = *str, t = *rev;
         *str = t;
         *rev = h;
     }
 }
 
-int32_t  strlen(const int8_t* s) {
+int32_t strlen(const char* s) {
     int32_t  i = 0;
     while (*(s + i++) != '\0');
     return --i;
 }
 
-void append(int8_t* s, int8_t n) {
+void append(char* s, char n) {
     int32_t  len = strlen(s);
     *(s + len++) = n;
     *(s + len) = '\0';
 }
 
-void backspace(int8_t* s) {
+void backspace(char* s) {
     int32_t  len = strlen(s);
     s[len - 1] = '\0';
 }
 
-int32_t  strcmp(int8_t* s1, int8_t* s2) {
+int32_t strcmp(char* s1, char* s2) {
     int32_t  i;
     for (i = 0; *(s1 + i) == *(s2 + i); ++i) {
         if (s1[i] == '\0') return 0;

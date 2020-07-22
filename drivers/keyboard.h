@@ -58,6 +58,11 @@
 
 #define KEYDOWN_ESCAPE 0xe0
 
+/**
+ * Starting from 0x02 and ends at 0x35
+ */
+static const char* KEYBOARD_CODES = "1234567890-=  qwertyuiop[]  asdfghjkl;'` \\zxcvbnm,./";
+static const char* SHIFT_KEYBOARD_CODES = "!@#$%^&*()_+  QWERTYUIOP{}  ASDFGHJKL:\"~ |ZXCVBNM<>?";
 
 void init_keyboard();
 

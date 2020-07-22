@@ -3,6 +3,8 @@
 //
 
 #include "screen.h"
+#include "../libc/mem.h"
+#include "../cpu/ports.h"
 
 void _kprint_at(char *message, int32_t  col, int32_t  row, int8_t attr);
 int32_t  print_char(char c, int32_t  col, int32_t  row, int8_t attr);
@@ -129,8 +131,8 @@ int32_t print_char(char c, int32_t  col, int32_t  row, int8_t attr) {
     if (offset >= MAX_ROWS * MAX_COLS * 2) {
         for (int32_t  i = 1; i < MAX_ROWS; ++i) {
             /* scroll one row */
-            memory_copy((uint8_t *) (get_offset(0, i) + VIDEO_ADDRESS),
-                        (uint8_t *) (get_offset(0, i - 1) + VIDEO_ADDRESS),
+            memcpy((void *) (get_offset(0, i) + VIDEO_ADDRESS),
+                    (const void *) (get_offset(0, i - 1) + VIDEO_ADDRESS),
                     MAX_COLS * 2);
         }
 

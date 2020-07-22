@@ -3,9 +3,9 @@
 //
 
 #include "timer.h"
-#include "../drivers/screen.h"
 #include "isr.h"
 #include "../libc/function.h"
+#include "ports.h"
 
 uint32_t tick = 0;
 

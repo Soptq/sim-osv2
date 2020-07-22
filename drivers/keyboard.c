@@ -8,12 +8,7 @@
 #include "screen.h"
 #include "../libc/function.h"
 #include "../kernel/kernel.h"
-
-/**
- * Starting from 0x02 and ends at 0x35
- */
-const int8_t* KEYBOARD_CODES = "1234567890-=  qwertyuiop[]  asdfghjkl;'` \\zxcvbnm,./";
-const int8_t* SHIFT_KEYBOARD_CODES = "!@#$%^&*()_+  QWERTYUIOP{}  ASDFGHJKL:\"~ |ZXCVBNM<>?";
+#include "../libc/string.h"
 
 int8_t shift_pressed = 0;
 int8_t capslock_pressed = 0;
@@ -34,14 +29,14 @@ static void keyboard_callback(registers_t *t) {
             case KEYDOWN_ESC:
                 break;
             case KEYDOWN_BACKSPACE:
-                backspace(key_buffer);
+                backspace((char*)key_buffer);
                 kbackspace();
                 break;
             case KEYDOWN_TAB:
                 break;
             case KEYDOWN_ENTER:
                 kprintln("");
-                user_input(key_buffer); /* kernel-controlled function */
+                user_input((char *)key_buffer); /* kernel-controlled function */
                 key_buffer[0] = '\0';
                 break;
             case KEYDOWN_LCTRL:
@@ -55,7 +50,7 @@ static void keyboard_callback(registers_t *t) {
             case KEYDOWN_LALT:
                 break;
             case KEYDOWN_SPACE:
-                append(key_buffer, ' ');
+                append((char *)key_buffer, ' ');
                 kprint(" ");
                 break;
             case KEYDOWN_CAPSLOCK:
@@ -131,8 +126,8 @@ static void keyboard_callback(registers_t *t) {
                     } else {
                         input = KEYBOARD_CODES[scancode - 0x02];
                     }
-                    int8_t str[2] = {input, '\0'};
-                    append(key_buffer, input);
+                    char str[2] = {input, '\0'};
+                    append((char *)key_buffer, input);
                     kprint(str);
                 }
                 /* Some keycodes we don't define */
