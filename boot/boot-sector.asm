@@ -1,18 +1,18 @@
 [org 0x7c00]
 KERNEL_OFFSET equ 0x1000
-    mov [BOOT_DRIVE], dl
+mov [BOOT_DRIVE], dl    ; BOOT_DRIVE is set to 0
 
-    mov bp, 0x9000
-    mov sp, bp
+mov bp, 0x9000          ; stack starts at 0x9000
+mov sp, bp
 
-    mov bx, MSG_REAL_MODE
-    call print
-    call print_nl
+mov bx, MSG_REAL_MODE   ; print msg
+call print
+call print_nl
 
-    call load_kernel
-    call switch_to_pm
+call load_kernel        ; load kernel to KERNEL_OFFSET
+call switch_to_pm
 
-    jmp $
+jmp $
 
 %include "./boot/16bit-print.asm"
 %include "./boot/16bit-print_hex.asm"
@@ -23,23 +23,29 @@ KERNEL_OFFSET equ 0x1000
 
 [bits 16]
 load_kernel:
-    mov bx, MSG_LOAD_KERNEL
+    mov bx, MSG_LOAD_KERNEL ; print msg
     call print
     call print_nl
 
-    mov bx, KERNEL_OFFSET
-    mov dh, 31               ; read 2 sectors
-    mov dl, [BOOT_DRIVE]
-    call disk_load
+    mov bx, KERNEL_OFFSET   ; our kernel is located at 0x1000
+                            ; so before calling int 13, we set bx to our kernel offset
+                            ; so that int 13 will read our kernel to bx
+    mov dh, 31              ; read 31 sectors, each sector contains 512 bytes / 0.5 Kb
+                            ; plus the boot sector, we read in total 32 sectors
+    mov dl, [BOOT_DRIVE]    ; designate boot drive 0
+    call disk_load          ; load disk, read data to the memory
     ret
 
 [bits 32]
-BEGIN_PM
-    mov ebx, MSG_PROT_MODE
+BEGIN_PM:
+    mov ebx, MSG_PROT_MODE  ; print msg
     call print_string_pm
-    call KERNEL_OFFSET      ; call our c code
-    mov ebx, MSG_RETURNED_KERNEL
+
+    call KERNEL_OFFSET      ; call our c_entry code
+
+    mov ebx, MSG_RETURNED_KERNEL    ; this line code should never be run
     call print_string_pm
+
     jmp $
 
 

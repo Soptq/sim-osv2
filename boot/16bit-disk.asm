@@ -3,9 +3,9 @@ disk_load:
     pusha
     push dx         ; save parameters
 
-    mov ah, 0x02    ; read disk
+    mov ah, 0x02    ; read
     mov al, dh      ; read dh sectors
-    mov cl, 0x02    ; read the second sector
+    mov cl, 0x02    ; read / start from the second sector
     mov ch, 0x00    ; read 0x00 cylinder
     mov dh, 0x00    ; head number
 
