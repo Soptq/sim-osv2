@@ -7,6 +7,7 @@
 
 #include "type.h"
 #include "isr.h"
+#include "../libc/mem.h"
 
 typedef struct page {
     uint32_t present    : 1;    /* page present */
@@ -29,9 +30,13 @@ typedef struct page_directory {
     uint32_t physical_addr;         /* physical address of tables_physical */
 } page_directory_t;
 
+extern page_directory_t  *kernel_directory;
+
 void initialize_paging();
 void switch_page_directory(page_directory_t *new, uint8_t force_enable_paging);
 page_t *get_page(uint32_t address, int make, page_directory_t *dir);
 void page_fault_callback(registers_t *regs);
+void alloc_frame(page_t *page, int is_kernel, int is_writeable);
+void free_frame(page_t *page);
 
 #endif //SIM_BOOTLOADER_PAGE_H

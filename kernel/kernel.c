@@ -25,7 +25,8 @@ void kernel_main() {
 
 void user_input(char *input) {
     if (strcmp(input, "END") == 0) {
-        kprint("Stopping the CPU. Bye!\n");
+        err_kprintln("");
+        err_kprintln("Stopping the CPU. Bye!");
         cpu_halt();
     }
 

@@ -8,6 +8,7 @@
 #include "ports.h"
 #include "timer.h"
 #include "../drivers/keyboard.h"
+#include "../libc/string.h"
 
 isr_t interrupt_handlers[256];
 
@@ -87,11 +88,17 @@ void isr_install() {
     set_idt_gate(46, (uint32_t)irq14, KERNEL_CS, 0x8E);
     set_idt_gate(47, (uint32_t)irq15, KERNEL_CS, 0x8E);
 
+    /**
+     * SYSTEM DEFINE INTERRUPT
+     */
+
+
     set_idt(); // Load with ASM
 }
 
 
 /* To print the message which defines every exception */
+/* CPU-dedicated interrupts are shown below.*/
 char *exception_messages[] = {
         "Division By Zero",
         "Debug",

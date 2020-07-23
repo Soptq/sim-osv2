@@ -5,6 +5,7 @@
 #include "screen.h"
 #include "../libc/mem.h"
 #include "../cpu/ports.h"
+#include "../libc/string.h"
 
 void _kprint_at(char *message, int32_t  col, int32_t  row, int8_t attr);
 int32_t  print_char(char c, int32_t  col, int32_t  row, int8_t attr);
@@ -54,6 +55,32 @@ void clear_screen() {
         vidptr[i * 2 + 1] = WHITE_ON_BLACK;
     }
     set_cursor_offset(get_offset(0, 0));
+}
+
+
+void kprint_hex(uint32_t hex) {
+    char tmp[11];
+    int_to_hexstr(hex, tmp);
+    kprint(tmp);
+}
+
+void kprintln_hex(uint32_t hex) {
+    char tmp[11];
+    int_to_hexstr(hex, tmp);
+    kprintln(tmp);
+}
+
+
+void err_kprint_hex(uint32_t hex) {
+    char tmp[11];
+    int_to_hexstr(hex, tmp);
+    err_kprint(tmp);
+}
+
+void err_kprintln_hex(uint32_t hex) {
+    char tmp[11];
+    int_to_hexstr(hex, tmp);
+    err_kprintln(tmp);
 }
 
 
@@ -131,8 +158,8 @@ int32_t print_char(char c, int32_t  col, int32_t  row, int8_t attr) {
     if (offset >= MAX_ROWS * MAX_COLS * 2) {
         for (int32_t  i = 1; i < MAX_ROWS; ++i) {
             /* scroll one row */
-            memcpy((void *) (get_offset(0, i) + VIDEO_ADDRESS),
-                    (const void *) (get_offset(0, i - 1) + VIDEO_ADDRESS),
+            memcpy((void *) (get_offset(0, i - 1) + VIDEO_ADDRESS),
+                    (const void *) (get_offset(0, i) + VIDEO_ADDRESS),
                     MAX_COLS * 2);
         }
 

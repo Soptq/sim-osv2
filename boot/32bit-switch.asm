@@ -1,5 +1,9 @@
 [bits 16]
 switch_to_pm:
+    mov bx, MSG_SW_PROT_MODE ; print msg
+    call print
+    call print_nl
+
     cli                     ; 1. disable interrupts
     lgdt [gdt_descriptor]   ; 2. load the GDT descriptor
 

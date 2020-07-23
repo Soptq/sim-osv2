@@ -24,4 +24,9 @@ void err_kprint(char *message);
 void err_kprintln(char *message);
 void kbackspace();
 
+void kprint_hex(uint32_t hex);
+void kprintln_hex(uint32_t hex);
+void err_kprint_hex(uint32_t hex);
+void err_kprintln_hex(uint32_t hex);
+
 #endif //SIM_OS_SCREEN_H
