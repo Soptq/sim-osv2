@@ -3,6 +3,7 @@ disk_load:
     pusha
     push dx         ; save parameters
 
+
     mov ah, 0x02    ; read
     mov al, dh      ; read dh sectors
     mov cl, 0x02    ; read / start from the second sector
@@ -10,7 +11,7 @@ disk_load:
     mov dh, 0x00    ; head number
 
     int 0x13        ; interrupt to start reading
-    jc disk_error   ; if carry == 1, error occured
+    jc disk_error   ; if carry == 1, error occurred
 
     pop dx
     cmp al, dh      ; check if we read dh sectors

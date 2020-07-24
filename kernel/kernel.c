@@ -7,33 +7,43 @@
 #include "../drivers/screen.h"
 #include "../cpu/page.h"
 #include "../libc/string.h"
+#include "../drivers/keyboard.h"
+
+void kuser_prompt() {
+    kprint("\n> ");
+    command_row = get_cursor_row();
+    command_col = get_cursor_col();
+    command_col_start = command_col;
+}
 
 void kernel_main() {
+    initialize_VGA();
     isr_install();
-    kprintln("ISR loaded");
     irq_install();
-    kprintln("IRQ loaded");
     initialize_paging();
-    kprintln("Page initialized");
-    kprintln("System booted");
     kprintln("");
 
-    kprint("Type something, it will go through the kernel\n"
-           "Type END to halt the CPU\n"
-           "> ");
+    kuser_prompt();
 }
 
 void user_input(char *input) {
-    if (strcmp(input, "END") == 0) {
+    if (strcmp(input, "halt") == 0) {
         err_kprintln("");
-        err_kprintln("Stopping the CPU. Bye!");
+        err_kprintln("Halting");
         cpu_halt();
     }
 
-    kprint("You said: ");
+    if (strcmp(input, "clear") == 0) {
+        clear_screen();
+        kuser_prompt();
+        return;
+    }
+
+    kprint("+=> ");
     kprint(input);
-    kprint("\n> ");
+    kuser_prompt();
 }
+
 
 void cpu_halt() {
     asm volatile("hlt");

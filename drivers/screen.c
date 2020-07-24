@@ -8,12 +8,16 @@
 #include "../libc/string.h"
 
 void _kprint_at(char *message, int32_t  col, int32_t  row, int8_t attr);
-int32_t  print_char(char c, int32_t  col, int32_t  row, int8_t attr);
+int32_t  print_char(char c, int32_t  col, int32_t  row, int8_t attr, uint8_t set_text_cursor);
 int32_t  get_cursor_offset();
 void set_cursor_offset(int32_t  offset);
 int32_t  get_offset(int32_t  col, int32_t  row);
 int32_t  get_offset_row(int32_t  offset);
 int32_t  get_offset_col(int32_t  offset);
+
+static uint8_t mouse_c[2];    /* store hidden data when the mouse cursor is float above*/
+mouse_position_t last_mouse_pos;
+static uint8_t is_scrolling = 0;
 
 
 /**
@@ -25,7 +29,7 @@ int32_t  get_offset_col(int32_t  offset);
  */
 
 
-void kprint_at(char *message, int32_t  col, int32_t  row) {
+void kprint_at(char *message, int32_t  col, int32_t row) {
     _kprint_at(message, col, row, WHITE_ON_BLACK);
 }
 
@@ -85,11 +89,76 @@ void err_kprintln_hex(uint32_t hex) {
 
 
 void kbackspace() {
-    int32_t  offset = get_cursor_offset() - 2;
-    int32_t  col = get_offset_col(offset);
-    int32_t  row = get_offset_row(offset);
-    print_char(' ', col, row, WHITE_ON_BLACK);
+    int32_t offset = get_cursor_offset() - 2;
+    int32_t col = get_offset_col(offset);
+    int32_t row = get_offset_row(offset);
+    print_char(' ', col, row, WHITE_ON_BLACK, 1);
     set_cursor_offset(offset);
+}
+
+void clear_mouse_cursor() {
+    print_char(mouse_c[0], last_mouse_pos.x, last_mouse_pos.y, mouse_c[1], 0);
+}
+
+
+void mouse_char_cache(int32_t col, int32_t row) {
+    if (col < 0 || col > MAX_COLS - 1 || row < 0 || row > MAX_ROWS - 1) {
+        mouse_c[0] = ' ';
+        mouse_c[1] = WHITE_ON_BLACK;
+    } else {
+        uint8_t *vidmem = (uint8_t *) VIDEO_ADDRESS;
+        int32_t offset = get_offset(col, row);
+        mouse_c[0] = vidmem[offset];
+        mouse_c[1] = vidmem[offset + 1];
+    }
+}
+
+void vga_mouse_callback(int32_t x, int32_t y, uint8_t bm, uint8_t br, uint8_t bl) {
+
+    if ((last_mouse_pos.x == x) &&
+        (last_mouse_pos.y == y)) {
+        return;
+    }
+
+    if (is_scrolling == 0)
+        clear_mouse_cursor();
+
+    last_mouse_pos.x = x;
+    last_mouse_pos.y = y;
+
+    if (is_scrolling == 1) return;
+
+    if (bl == 1) {
+        set_cursor_offset(get_offset(last_mouse_pos.x, last_mouse_pos.y));
+    }
+
+    mouse_char_cache(last_mouse_pos.x, last_mouse_pos.y);
+    print_char(' ', last_mouse_pos.x, last_mouse_pos.y, BLACK_ON_GREEN, 0);
+}
+
+
+void initialize_VGA() {
+    last_mouse_pos.x = 0;
+    last_mouse_pos.y = 0;
+
+    uint8_t* vidmem = (uint8_t*) VIDEO_ADDRESS;
+    int32_t offset = get_offset(last_mouse_pos.x, last_mouse_pos.y);
+    mouse_c[0] = vidmem[offset];
+    mouse_c[1] = vidmem[offset + 1];
+}
+
+
+int32_t get_cursor_row() {
+    return get_offset_row(get_cursor_offset());
+}
+
+
+int32_t get_cursor_col() {
+    return get_offset_col(get_cursor_offset());
+}
+
+int32_t set_cursor_pos(int32_t col, int32_t row) {
+    set_cursor_offset(get_offset(col, row));
 }
 
 
@@ -122,14 +191,14 @@ void _kprint_at(char *message, int32_t  col, int32_t  row, int8_t attr) {
 
     int32_t  i = 0;
     while (message[i] != 0) {
-        offset = print_char(message[i++], col, row, attr);
+        offset = print_char(message[i++], col, row, attr, 1);
         row = get_offset_row(offset);
         col = get_offset_col(offset);
     }
 }
 
 
-int32_t print_char(char c, int32_t  col, int32_t  row, int8_t attr) {
+int32_t print_char(char c, int32_t  col, int32_t  row, int8_t attr, uint8_t set_text_cursor) {
     uint8_t* vidmem = (uint8_t*) VIDEO_ADDRESS;
     if (!attr) attr = WHITE_ON_BLACK;
 
@@ -155,7 +224,12 @@ int32_t print_char(char c, int32_t  col, int32_t  row, int8_t attr) {
     }
 
     /* check if the offset is over screen size and scroll */
-    if (offset >= MAX_ROWS * MAX_COLS * 2) {
+    if (set_text_cursor == 1 && offset >= MAX_ROWS * MAX_COLS * 2) {
+
+        is_scrolling = 1;
+        clear_mouse_cursor();
+        mouse_char_cache(last_mouse_pos.x, last_mouse_pos.y + 1);
+
         for (int32_t  i = 1; i < MAX_ROWS; ++i) {
             /* scroll one row */
             memcpy((void *) (get_offset(0, i - 1) + VIDEO_ADDRESS),
@@ -168,21 +242,25 @@ int32_t print_char(char c, int32_t  col, int32_t  row, int8_t attr) {
         for (int32_t  i = 0; i < MAX_COLS * 2; ++i) last_line[i] = 0;
 
         offset -= 2 * MAX_COLS;
+
+        is_scrolling = 0;
+        print_char(' ', last_mouse_pos.x, last_mouse_pos.y, BLACK_ON_GREEN, 0);
     }
 
-    set_cursor_offset(offset);
+    if (set_text_cursor)
+        set_cursor_offset(offset);
     return offset;
 }
 
-int32_t  get_cursor_offset() {
+int32_t get_cursor_offset() {
     port_byte_out(REG_SCREEN_CTRL, 14);
-    int32_t  offset = port_byte_in(REG_SCREEN_DATA) << 8;
+    int32_t offset = port_byte_in(REG_SCREEN_DATA) << 8;
     port_byte_out(REG_SCREEN_CTRL, 15);
     offset += port_byte_in(REG_SCREEN_DATA);
     return offset * 2;
 }
 
-void set_cursor_offset(int32_t  offset) {
+void set_cursor_offset(int32_t offset) {
     offset /= 2;
     port_byte_out(REG_SCREEN_CTRL, 14);
     /* Firstly we send the higher 8 bits of the offset */
@@ -191,14 +269,14 @@ void set_cursor_offset(int32_t  offset) {
     port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset & 0xff));
 }
 
-int32_t  get_offset(int32_t  col, int32_t  row) {
+int32_t get_offset(int32_t  col, int32_t  row) {
     return 2 * (row * MAX_COLS + col);
 }
 
-int32_t  get_offset_row(int32_t  offset) {
+int32_t get_offset_row(int32_t  offset) {
     return offset / (2 * MAX_COLS);
 }
 
-int32_t  get_offset_col(int32_t  offset) {
+int32_t get_offset_col(int32_t  offset) {
     return (offset - (2 * MAX_COLS * get_offset_row(offset))) / 2;
 }

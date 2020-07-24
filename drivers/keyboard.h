@@ -5,6 +5,8 @@
 #ifndef SIM_OS_KEYBOARD_H
 #define SIM_OS_KEYBOARD_H
 
+#include "../cpu/type.h"
+
 /**
  * Details of keycode mapping: https://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
  */
@@ -63,6 +65,10 @@
  */
 static const char* KEYBOARD_CODES = "1234567890-=  qwertyuiop[]  asdfghjkl;'` \\zxcvbnm,./";
 static const char* SHIFT_KEYBOARD_CODES = "!@#$%^&*()_+  QWERTYUIOP{}  ASDFGHJKL:\"~ |ZXCVBNM<>?";
+
+extern int32_t command_row;
+extern int32_t command_col;
+extern int32_t command_col_start;
 
 void init_keyboard();
 

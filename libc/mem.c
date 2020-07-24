@@ -127,8 +127,8 @@ static int8_t header_t_less_then(void* a, void* b) {
 heap_t *create_heap(uint32_t start, uint32_t end, uint32_t max, uint8_t supervisor, uint8_t readonly) {
     heap_t *heap = (heap_t*)kmalloc(sizeof(heap_t));
 
-    assert(start % 0x1000 == 0, "Heap initialization failed! Start address is not aligned");
-    assert(end % 0x1000 == 0, "Heap initialization failed! End address is not aligned");
+    assert(start % 0x1000 == 0, "0x0002");
+    assert(end % 0x1000 == 0, "0x0003");
 
     heap -> index = place_ordered_array((void *)start, HEAP_INDEX_SIZE, &header_t_less_then);
 
@@ -158,7 +158,7 @@ heap_t *create_heap(uint32_t start, uint32_t end, uint32_t max, uint8_t supervis
 
 static void expand(uint32_t new_size, heap_t *heap) {
     assert((new_size > ((heap -> end_address) - (heap -> start_address))),
-            "Heap expand failed! The requested new_size is smaller than the exists");
+            "0x0004");
 
     if (new_size & 0x00000FFF) {
         new_size &= 0xFFFFF000;
@@ -166,7 +166,7 @@ static void expand(uint32_t new_size, heap_t *heap) {
     }
 
     assert((heap -> start_address) + new_size <= (heap -> max_address),
-            "Heap expand failed! The requested new_size is out of max_address");
+            "0x0005");
 
     uint32_t old_size = (heap -> end_address) - (heap -> start_address);
     uint32_t i = old_size;
@@ -180,7 +180,7 @@ static void expand(uint32_t new_size, heap_t *heap) {
 
 static uint32_t contract(uint32_t new_size, heap_t *heap) {
     assert((new_size < (heap -> end_address) - (heap -> start_address)),
-            "Heap contract failed! The requested new_size is larger than the exists");
+            "0x0006");
 
     if (new_size & 0x00000FFF) {
         new_size &= 0xFFFFF000;
@@ -337,9 +337,9 @@ void free(void *p, heap_t *heap) {
             ((uint32_t)header + header -> size - sizeof(heap_footer_t));
 
     assert(header -> magic == HEAP_MAGIC,
-            "Heap free() error! Header's magic number don't match! Memory is disrupted!");
+            "0x0007");
     assert(footer -> magic == HEAP_MAGIC,
-           "Heap free() error! Footer's magic number don't match! Memory is disrupted!");
+           "0x0008");
 
     header -> is_hole = 1;
     uint8_t do_add = 1; /* do we want to add this hole to the heap index? */
@@ -371,7 +371,7 @@ void free(void *p, heap_t *heap) {
             iterator++;
 
         assert(iterator < heap -> index.size,
-                "Heap free() error! Iterator our of the index bound!");
+                "0x0009");
 
         remove_ordered_array(iterator, &heap -> index);
     }

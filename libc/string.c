@@ -61,8 +61,13 @@ char c_int_to_hex(int index) {
 }
 
 
+
+
 void int_to_hexstr(uint32_t n, char* str) {
     str_clear(str);
+    if (n == 0) {
+        append(str, '0');
+    }
     while (n != 0) {
         append(str, c_int_to_hex(n % 16));
         n /= 16;
@@ -98,9 +103,41 @@ void append(char* s, char n) {
     *(s + len) = '\0';
 }
 
+void insert(char* s, char n, int32_t i) {
+    int32_t index = i;
+    int32_t len = strlen(s);
+    char tmp = s[index], tmp2;
+    s[index] = n;
+    while (index < len) {
+        tmp2 = s[index + 1];
+        s[index + 1] = tmp;
+        tmp = tmp2;
+        index += 1;
+    }
+    s[index + 1] = 0;
+}
+
 void backspace(char* s) {
     int32_t  len = strlen(s);
     s[len - 1] = '\0';
+}
+
+
+void c_pop(char* s, int32_t i) {
+    if (i < 0) {
+        return;
+    }
+    int32_t index = i;
+    int32_t len = strlen(s);
+    len--;
+    char tmp = s[len], tmp2;
+    s[len] = s[len + 1];
+    while (index < len) {
+        tmp2 = s[len - 1];
+        s[len - 1] = tmp;
+        tmp = tmp2;
+        len--;
+    }
 }
 
 int32_t strcmp(char* s1, char* s2) {

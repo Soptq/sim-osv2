@@ -5,7 +5,6 @@
 #include "page.h"
 #include "../kernel/kernel.h"
 #include "../drivers/screen.h"
-#include "../libc/string.h"
 #include "../libc/assert.h"
 
 #define INDEX_FROM_BIT(a) (a/(8*4))
@@ -65,7 +64,7 @@ void alloc_frame(page_t *page, int is_kernel, int is_writeable) {
 
     uint32_t idx = first_frame();
 
-    assert(idx != (uint32_t)-1, "NO FREE FRAMES!");
+    assert(idx != (uint32_t)-1, "0x00011");
     set_frame(idx << 12);
     page -> present = 1;
     page -> rw = (is_writeable) ? 1 : 0;
@@ -168,13 +167,11 @@ void page_fault_callback(registers_t *r) {
     int reserved = r -> err_code & 0x8;     /* overwritten reserved bits? */
     int id = r -> err_code & 0x10;          /* instruction fetch? */
 
-    err_kprintln("Page Fault!");
-    kprint("Detail: ");
-    if (present) {err_kprint(" Present ");}
-    if (rw) {err_kprint(" Read-only ");}
-    if (user) {err_kprint(" User-mode ");}
-    if (reserved) {err_kprint(" Reserved ");}
-    if (id) {err_kprint(" Instr-fetch ");}
+    if (present) {err_kprint("P");}
+    if (rw) {err_kprint("R");}
+    if (user) {err_kprint("U");}
+    if (reserved) {err_kprint("R");}
+    if (id) {err_kprint("I");}
     kprint(" At ");
     err_kprintln_hex(faulting_address);
     cpu_halt();

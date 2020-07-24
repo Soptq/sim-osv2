@@ -9,6 +9,7 @@
 #include "timer.h"
 #include "../drivers/keyboard.h"
 #include "../libc/string.h"
+#include "../drivers/mouse.h"
 
 isr_t interrupt_handlers[256];
 
@@ -97,45 +98,45 @@ void isr_install() {
 }
 
 
-/* To print the message which defines every exception */
-/* CPU-dedicated interrupts are shown below.*/
-char *exception_messages[] = {
-        "Division By Zero",
-        "Debug",
-        "Non Maskable Interrupt",
-        "Breakpoint",
-        "Into Detected Overflow",
-        "Out of Bounds",
-        "Invalid Opcode",
-        "No Coprocessor",
-
-        "Double Fault",
-        "Coprocessor Segment Overrun",
-        "Bad TSS",
-        "Segment Not Present",
-        "Stack Fault",
-        "General Protection Fault",
-        "Page Fault",
-        "Unknown Interrupt",
-
-        "Coprocessor Fault",
-        "Alignment Check",
-        "Machine Check",
-        "Reserved",
-        "Reserved",
-        "Reserved",
-        "Reserved",
-        "Reserved",
-
-        "Reserved",
-        "Reserved",
-        "Reserved",
-        "Reserved",
-        "Reserved",
-        "Reserved",
-        "Reserved",
-        "Reserved"
-};
+///* To print the message which defines every exception */
+///* CPU-dedicated interrupts are shown below.*/
+//char *exception_messages[] = {
+//        "Division By Zero",
+//        "Debug",
+//        "Non Maskable Interrupt",
+//        "Breakpoint",
+//        "Into Detected Overflow",
+//        "Out of Bounds",
+//        "Invalid Opcode",
+//        "No Coprocessor",
+//
+//        "Double Fault",
+//        "Coprocessor Segment Overrun",
+//        "Bad TSS",
+//        "Segment Not Present",
+//        "Stack Fault",
+//        "General Protection Fault",
+//        "Page Fault",
+//        "Unknown Interrupt",
+//
+//        "Coprocessor Fault",
+//        "Alignment Check",
+//        "Machine Check",
+//        "Reserved",
+//        "Reserved",
+//        "Reserved",
+//        "Reserved",
+//        "Reserved",
+//
+//        "Reserved",
+//        "Reserved",
+//        "Reserved",
+//        "Reserved",
+//        "Reserved",
+//        "Reserved",
+//        "Reserved",
+//        "Reserved"
+//};
 
 
 void isr_handler(registers_t *r) {
@@ -148,8 +149,8 @@ void isr_handler(registers_t *r) {
     err_kprint(int_no);
     kprint(" Error Code ");
     err_kprintln(error_code);
-    kprint("Detail: ");
-    err_kprintln(exception_messages[r -> int_no]);
+//    kprint("Detail: ");
+//    err_kprintln(exception_messages[r -> int_no]);
     kprintln("");
 
     if (interrupt_handlers[r -> int_no] != 0) {
@@ -179,6 +180,7 @@ void irq_install() {
     asm volatile ("sti");
     init_timer(50);
     init_keyboard();
+    install_mouse();
 }
 
 

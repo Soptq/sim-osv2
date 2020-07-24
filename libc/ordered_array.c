@@ -52,7 +52,7 @@ void destory_ordered_array(ordered_array_t *array) {
 }
 
 void insert_ordered_array(type_t item, ordered_array_t *array) {
-    assert(array->less_than != NULL, "Ordered array insertion failed! Function less_than not configured!");
+    assert(array->less_than != NULL, "0x000a");
     uint32_t iterator = 0;
     while ((iterator < array -> size) &&
         (array -> less_than(array -> array[iterator], item))) {
@@ -76,7 +76,7 @@ void insert_ordered_array(type_t item, ordered_array_t *array) {
 }
 
 type_t lookup_ordered_array(uint32_t i, ordered_array_t *array) {
-    assert(i < array -> size, "Ordered array lookup failed! lookup index is out of the bound!");
+    assert(i < array -> size, "0x000b");
     return array -> array[i];
 }
 

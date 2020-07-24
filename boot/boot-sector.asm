@@ -34,6 +34,9 @@ load_kernel:
     call print
     call print_nl
 
+    ; IMPORTANT: Addresing of buffer should guarantee that
+    ; the *complete buffer* is _*inside*_ the given segment,
+    ; i.e. (BX + size_of_buffer) <= 10000h
     mov bx, KERNEL_OFFSET   ; our kernel is located at 0x1000
                             ; so before calling int 13, we set bx to our kernel offset
                             ; so that int 13 will read our kernel to bx
