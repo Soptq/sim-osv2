@@ -1,6 +1,6 @@
 # sim-osv2
 
-A toy bootloader + kernel that implemented the follow:
+A toy bootloader + kernel that implemented the following:
 1. GDT
 2. Bootloader to boot our kernel
 3. IDT 
@@ -12,7 +12,8 @@ A toy bootloader + kernel that implemented the follow:
 9. Memory allocator
 10. Paging
 11. Virtual memory
-... More is coming
+
+... More are coming
 
 ### Error Code
 
