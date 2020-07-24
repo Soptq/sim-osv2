@@ -9,7 +9,7 @@
 
 #define MOUSE_SENSITIVITY 2
 
-typedef struct {
+typedef struct mouse_position {
     int32_t x;
     int32_t y;
 } mouse_position_t;

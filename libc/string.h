@@ -12,6 +12,7 @@ void hex_to_ascii(int32_t  n, char* str);
 void int_to_hexstr(uint32_t n, char* str);
 
 void strrev(char* str);
+char* strcpy(char* destination, const char* source);
 int32_t  strlen(const char* s);
 void append(char* s, char n);
 void insert(char* s, char n, int32_t index);

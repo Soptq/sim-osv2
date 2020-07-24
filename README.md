@@ -1,3 +1,18 @@
+# sim-osv2
+
+A toy bootloader + kernel that implemented the follow:
+1. GDT
+2. Bootloader to boot our kernel
+3. IDT 
+4. IRQ
+5. IRQ Timer
+6. Keybord driver
+7. Mouse driver
+8. VGA driver
+9. Memory allocator
+10. Paging
+11. Virtual memory
+... More is coming
 
 ### Error Code
 

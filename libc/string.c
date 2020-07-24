@@ -97,6 +97,22 @@ int32_t strlen(const char* s) {
     return --i;
 }
 
+
+char* strcpy(char* destination, const char* source) {
+    if (destination == NULL)
+        return NULL;
+
+    char *ptr = destination;
+    while (*source != '\0') {
+        *destination = *source;
+        destination++;
+        source++;
+    }
+    *destination = '\0';
+    return ptr;
+}
+
+
 void append(char* s, char n) {
     int32_t  len = strlen(s);
     *(s + len++) = n;
